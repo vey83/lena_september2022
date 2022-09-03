@@ -179,27 +179,6 @@ source("data_simulation_gemeinden_other.R")
   
   #Output Abstimmungen Gemeinde
   output_dw <- get_output_gemeinden(results)
-  
-  #Anpassungen (Val Mara)
-  gemeinde_adapt <- output_dw[output_dw$Gemeinde_Nr == 5240,] 
-  
-  gemeinde_adapt$Gemeinde_Nr[1] <- 5195
-  output_dw <- rbind(output_dw,gemeinde_adapt)
-  
-  gemeinde_adapt$Gemeinde_Nr[1] <- 5197
-  output_dw <- rbind(output_dw,gemeinde_adapt)
-  
-  gemeinde_adapt$Gemeinde_Nr[1] <- 5219
-  output_dw <- rbind(output_dw,gemeinde_adapt)
-  
-  #Anpassungen (Schwende-Rüte)
-  gemeinde_adapt <- output_dw[output_dw$Gemeinde_Nr == 3112,] 
-  
-  gemeinde_adapt$Gemeinde_Nr[1] <- 3103
-  output_dw <- rbind(output_dw,gemeinde_adapt)
-  
-  gemeinde_adapt$Gemeinde_Nr[1] <- 3105
-  output_dw <- rbind(output_dw,gemeinde_adapt)
 
   #Output speichern
   write.csv(output_dw,paste0("Output/",vorlagen_short[i],"_dw.csv"), na = "", row.names = FALSE, fileEncoding = "UTF-8")
@@ -317,7 +296,6 @@ data_overview <- rbind(data_overview,entry_overview)
 
 }
 
-View(results_othervote)
 #Uebersicht für Datawrapper
 data_overview <- data_overview[-1,]
 write.csv(data_overview,"Output/Uebersicht_dw.csv", na = "", row.names = FALSE, fileEncoding = "UTF-8")
