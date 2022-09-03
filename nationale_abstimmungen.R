@@ -181,8 +181,15 @@ source("data_simulation_gemeinden_other.R")
   output_dw <- get_output_gemeinden(results)
 
   #Output speichern
-  write.csv(output_dw,paste0("Output/",vorlagen_short[i],"_dw.csv"), na = "", row.names = FALSE, fileEncoding = "UTF-8")
   
+###Special AHV
+if (vorlagen$id[i] == "6590" || vorlagen$id[i] == "6600") {
+  write.csv(output_dw[,-c(9,10)],paste0("Output/",vorlagen_short[i],"_dw.csv"), na = "", row.names = FALSE, fileEncoding = "UTF-8")
+  write.csv(output_dw[,-c(8,10)],paste0("Output/",vorlagen_short[i],"_dw_fr.csv"), na = "", row.names = FALSE, fileEncoding = "UTF-8")
+  write.csv(output_dw[,-c(8,9)],paste0("Output/",vorlagen_short[i],"_dw_it.csv"), na = "", row.names = FALSE, fileEncoding = "UTF-8")
+  } else {  
+  write.csv(output_dw,paste0("Output/",vorlagen_short[i],"_dw.csv"), na = "", row.names = FALSE, fileEncoding = "UTF-8")
+}
   count_non_gemeinden <- output_dw[output_dw$Nein_Stimmen_In_Prozent>50,]
   
   count_yes_gemeinden <- output_dw[output_dw$Ja_Stimmen_In_Prozent>50,]
@@ -235,25 +242,28 @@ if (hold == FALSE) {
                             round(100-results_national$jaStimmenInProzent,1)," %</b> no")
 
   }  
+  
+  datawrapper_codes_vorlage <- datawrapper_codes[datawrapper_codes$Vorlage == vorlagen_short[i],]
+
     #Karten Gemeinden
-    dw_edit_chart(datawrapper_codes[i,2],intro=undertitel_de,annotate=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%d.%m.%Y %H:%M Uhr")))
-    dw_publish_chart(datawrapper_codes[i,2])
-    
-    dw_edit_chart(datawrapper_codes[i,4],intro=undertitel_fr,annotate=paste0("dernière mise à jour: ",format(Sys.time(),"%d.%m.%Y %Hh%M")))
-    dw_publish_chart(datawrapper_codes[i,4])
-    
-    dw_edit_chart(datawrapper_codes[i,6],intro=undertitel_it,annotate=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%d.%m.%Y %H:%M")))
-    dw_publish_chart(datawrapper_codes[i,6])
-    
-    #Karten Kantone
-    dw_edit_chart(datawrapper_codes[i,3],intro=undertitel_de,annotate=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%d.%m.%Y %H:%M Uhr")))
-    dw_publish_chart(datawrapper_codes[i,3])
-    
-    dw_edit_chart(datawrapper_codes[i,5],intro=undertitel_fr,annotate=paste0("dernière mise à jour: ",format(Sys.time(),"%d.%m.%Y %Hh%M")))
+    dw_edit_chart(datawrapper_codes[i,5],intro=undertitel_de,annotate=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%d.%m.%Y %H:%M Uhr")))
     dw_publish_chart(datawrapper_codes[i,5])
     
-    dw_edit_chart(datawrapper_codes[i,7],intro=undertitel_it,annotate=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%d.%m.%Y %H:%M")))
-    dw_publish_chart(datawrapper_codes[i,7])
+    dw_edit_chart(datawrapper_codes[i+2,5],intro=undertitel_fr,annotate=paste0("dernière mise à jour: ",format(Sys.time(),"%d.%m.%Y %Hh%M")))
+    dw_publish_chart(datawrapper_codes[i+2,5])
+    
+    dw_edit_chart(datawrapper_codes[i+4,5],intro=undertitel_it,annotate=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%d.%m.%Y %H:%M")))
+    dw_publish_chart(datawrapper_codes[i+4,5])
+    
+    #Karten Kantone
+    dw_edit_chart(datawrapper_codes[i+1,5],intro=undertitel_de,annotate=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%d.%m.%Y %H:%M Uhr")))
+    dw_publish_chart(datawrapper_codes[i+1,5])
+    
+    dw_edit_chart(datawrapper_codes[i+3,5],intro=undertitel_fr,annotate=paste0("dernière mise à jour: ",format(Sys.time(),"%d.%m.%Y %Hh%M")))
+    dw_publish_chart(datawrapper_codes[i+3,5])
+    
+    dw_edit_chart(datawrapper_codes[i+5,5],intro=undertitel_it,annotate=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%d.%m.%Y %H:%M")))
+    dw_publish_chart(datawrapper_codes[i+5,5])
 }  
 
 #Eintrag für Uebersicht
@@ -301,13 +311,15 @@ data_overview <- data_overview[-1,]
 write.csv(data_overview,"Output/Uebersicht_dw.csv", na = "", row.names = FALSE, fileEncoding = "UTF-8")
 
 #Charts Uebersicht
-dw_data_to_chart(data_overview,"O1i9P")
-dw_edit_chart("O1i9P",intro=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%H:%M Uhr")))
-dw_publish_chart("O1i9P")
+dw_data_to_chart(data_overview,datawrapper_codes[1,5])
+dw_edit_chart(datawrapper_codes[1,5],intro=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%H:%M Uhr")))
+dw_publish_chart(datawrapper_codes[1,5])
 
-dw_edit_chart("Ocame",intro=paste0("Dernière mise à jour: ",format(Sys.time(),"%Hh%M")))
-dw_publish_chart("Ocame")
+dw_data_to_chart(data_overview,datawrapper_codes[2,5])
+dw_edit_chart(datawrapper_codes[2,5],intro=paste0("Dernière mise à jour: ",format(Sys.time(),"%Hh%M")))
+dw_publish_chart(datawrapper_codes[2,5])
 
-dw_edit_chart("ot8Mm",intro=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%H:%M")))
-dw_publish_chart("ot8Mm")
+dw_data_to_chart(data_overview,datawrapper_codes[3,5])
+dw_edit_chart(datawrapper_codes[3,5],intro=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%H:%M")))
+dw_publish_chart(datawrapper_codes[3,5])
 

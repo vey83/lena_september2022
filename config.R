@@ -52,7 +52,8 @@ meta_gmd_kt <- read_csv("Data/MASTERFILE_GDE.csv")
 cat("Metadaten zu Gemeinden und Kantonen geladen\n")
 
 #Datawrapper-Codes
-datawrapper_codes <- as.data.frame(read_excel("Data/Datawrapper_Codes.xlsx"))
+datawrapper_codes <- as.data.frame(read_excel("Data/metadaten_grafiken.xlsx"))
+datawrapper_codes <- datawrapper_codes[,c(1:5)]
 
 datawrapper_auth("BMcG33cGBCp2FpqF1BSN5lHhKrw2W8Ait4AYbDEjkjVgCiWe07iqoX5pwHXdW36g", overwrite = TRUE)
 
