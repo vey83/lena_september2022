@@ -19,12 +19,6 @@ for (i in 1:length(vorlagen_short)) {
 #Simulation Gemeinden
 #source("data_simulation_gemeinden.R")
   
-  #Emergency adapt
-  #results$gebietAusgezaehlt[155] <- TRUE
-  #results$gebietAusgezaehlt[897] <- TRUE
-  #results$gebietAusgezaehlt[898] <- TRUE
-  #results$gebietAusgezaehlt[899] <- TRUE
-  
   #Daten anpassen Gemeinden
   results <- treat_gemeinden(results)
   results <- format_data_g(results)
@@ -50,7 +44,6 @@ for (i in 1:length(vorlagen_short)) {
   #Wie viele Gemeinden sind ausgezählt
   cat(paste0(sum(results$Gebiet_Ausgezaehlt)," Gemeinden sind ausgezählt.\n"))
   
-
   #Neue Variablen
   results <- results %>%
     mutate(Ja_Nein = NA,
@@ -64,7 +57,9 @@ for (i in 1:length(vorlagen_short)) {
            Text_f = "Les résultats ne sont pas encore connus dans cette commune.",
            Text_i = "I resultati di questa comune non sono ancora noti.")
   
+  #Spezialfälle
   hist_check <- FALSE
+  other_check <- FALSE
   
   #Ausgezählte Gemeinden auswählen
   results_notavailable <- results[results$Gebiet_Ausgezaehlt == FALSE,]
@@ -81,48 +76,55 @@ for (i in 1:length(vorlagen_short)) {
     
     #LENA-Classics (falls alle Gemeinden ausgezählt):
     if (nrow(results_notavailable) == 0) {
-      
       results <- lena_classics(results)
-      
     }  
     
-    #Historischer Vergleich (falls vorhanden)
+    #Special Vergleich mit anderer Abstimmung am selben Datum
+    if (vorlagen$id[i] == "6590" || vorlagen$id[i] == "6600") { 
+    other_check <- TRUE
+    if (vorlagen$id[i] == "6590") {
+      results_othervote <- get_results(json_data,i+1)
+    } else if (vorlagen$id[i] == "6600") {
+      results_othervote <- get_results(json_data,i-1)
+    }
+    results_othervote <- results_othervote %>%
+      select(Gemeinde_Nr,
+             jaStimmenInProzent) %>%
+      rename(Other_Ja_Stimmen_In_Prozent = jaStimmenInProzent) %>%
+      mutate(Other_Nein_Stimmen_In_Prozent = 100-Other_Ja_Stimmen_In_Prozent)
     
-    #Check Vorlagen-ID
+    results <- merge(results,results_othervote,all.x = TRUE)
+    results <- other_storyfinder(results)
+    }
     
-   # if (vorlagen$id[i] == "6510") { 
-  #    hist_check <- TRUE 
-  #    data_hist <- format_data_hist(daten_tierversuche_bfs)
-  #    results <- merge(results,data_hist,all.x = TRUE)
-  #    results <- hist_storyfinder(results)
 
-   # }
+    #Historischer Vergleich (falls vorhanden)
+
+    #Check Vorlagen-ID
+    if (vorlagen$id[i] == "6590" || vorlagen$id[i] == "6600") { 
+      hist_check <- TRUE 
+      data_hist <- format_data_hist(daten_altersvorsorge_bfs)
+      results <- merge(results,data_hist,all.x = TRUE)
     
-  #  if (vorlagen$id[i] == "6520") { 
-  #    hist_check <- TRUE 
-  #    data_hist <- format_data_hist(daten_tabak_bfs)
-  #    results <- merge(results,data_hist,all.x = TRUE)
-  #    results <- hist_storyfinder(results)
-      
-  #  }
+      if (other_check == FALSE) {
+      results <- hist_storyfinder(results)
+      } else {
+      results <- hist_storyfinder_special(results)
+      }
+    }
     
-  
     #Vergleich innerhalb des Kantons (falls alle Daten vom Kanton vorhanden)
     
     #Check Vorlagen-ID
-    #if (vorlagen$id[i] == "6530" || vorlagen$id[i] == "6540") {
+    if (vorlagen$id[i] == "6580" || vorlagen$id[i] == "6610") {
       
       #Falls mindestens ein Kanton ausgezählt -> Stories für die Kantone finden
-      
       if (length(unique(results_notavailable$Kantons_Nr)) < 26) {
-        
         results <- kanton_storyfinder(results)
-        
       }
-      
-    #}
+    }
     
-    
+
     ###Storybuilder
     
     #Textvorlagen laden
@@ -139,9 +141,6 @@ for (i in 1:length(vorlagen_short)) {
     ###Texte anpassen und optimieren
     results <- excuse_my_french(results)
     
-    #Print out texts
-    #cat(paste0(results$Gemeinde_d,"\n",results$Text_d,"\n\n",results$Text_f,collapse="\n\n"))
-    
   }
   ###Ausgezählte und nicht ausgezählte Gemeinden wieder zusammenführen -> Immer gleiches Format für Datawrapper
   if (nrow(results_notavailable) > 0) {
@@ -155,6 +154,12 @@ for (i in 1:length(vorlagen_short)) {
       results_notavailable$Hist_Ja_Stimmen_Absolut <- NA
       results_notavailable$Hist_Nein_Stimmen_In_Prozent <- NA
       results_notavailable$Hist_Nein_Stimmen_Absolut <- NA
+      
+    }
+    
+    if (other_check == TRUE) {
+      results_notavailable$Other_Ja_Stimmen_In_Prozent <- NA
+      results_notavailable$Other_Nein_Stimmen_In_Prozent <- NA
     }
     
     results <- rbind(results,results_notavailable) %>%
@@ -210,8 +215,6 @@ for (i in 1:length(vorlagen_short)) {
   print(paste0("Stände JA: ",results_national$jaStaendeGanz+(results_national$jaStaendeHalb/2)))
   print(paste0("Stände NEIN: ",results_national$neinStaendeGanz+(results_national$neinStaendeHalb/2)))
   
-
-  
   source("outputs_einzugsgebiete.R", encoding = "UTF-8")
   
   #Log Kantone
@@ -224,12 +227,10 @@ for (i in 1:length(vorlagen_short)) {
   
   cat(paste0("\nGenerated output for Vorlage ",vorlagen_short[i],"\n"))
   
-  
   #Datawrapper-Karten aktualisieren
   undertitel_de <- "Es sind noch keine Gemeinden ausgezählt."
   undertitel_fr <- "Aucun résultat n'est encore connu."
   undertitel_it <- "Nessun risultato è ancora noto."
-
   
   if (sum(results$Gebiet_Ausgezaehlt) > 0 ) {
     
@@ -248,7 +249,7 @@ for (i in 1:length(vorlagen_short)) {
                             round(results_national$jaStimmenInProzent,1)," %</b> sì, <b>",
                             round(100-results_national$jaStimmenInProzent,1)," %</b> no")
 
-  }   
+ 
     #Karten Gemeinden
     dw_edit_chart(datawrapper_codes[i,2],intro=undertitel_de,annotate=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%d.%m.%Y %H:%M Uhr")))
     dw_publish_chart(datawrapper_codes[i,2])
@@ -269,7 +270,7 @@ for (i in 1:length(vorlagen_short)) {
     dw_edit_chart(datawrapper_codes[i,7],intro=undertitel_it,annotate=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%d.%m.%Y %H:%M")))
     dw_publish_chart(datawrapper_codes[i,7])
     
-
+  }  
 
 #Eintrag für Uebersicht
 uebersicht_text_de <- paste0("<b>",vorlagen$text[i],"</b><br>",
@@ -313,17 +314,15 @@ data_overview <- rbind(data_overview,entry_overview)
 
 #Uebersicht für Datawrapper
 data_overview <- data_overview[-1,]
-
 write.csv(data_overview,"Output/Uebersicht_dw.csv", na = "", row.names = FALSE, fileEncoding = "UTF-8")
 
 #Charts Uebersicht
+dw_edit_chart("O1i9P",intro=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%H:%M Uhr")))
+dw_publish_chart("O1i9P")
 
-dw_edit_chart("qAKpk",intro=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%H:%M Uhr")))
-dw_publish_chart("qAKpk")
+dw_edit_chart("Ocame",intro=paste0("Dernière mise à jour: ",format(Sys.time(),"%Hh%M")))
+dw_publish_chart("Ocame")
 
-dw_edit_chart("tBIcV",intro=paste0("Dernière mise à jour: ",format(Sys.time(),"%Hh%M")))
-dw_publish_chart("tBIcV")
-
-dw_edit_chart("5xSDG",intro=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%H:%M")))
-dw_publish_chart("5xSDG")
+dw_edit_chart("ot8Mm",intro=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%H:%M")))
+dw_publish_chart("ot8Mm")
 

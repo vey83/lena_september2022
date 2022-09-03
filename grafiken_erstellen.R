@@ -50,39 +50,29 @@ length_stimmbeteiligung <- round(Stimmbeteiligung/5)
 length_Staende_Ja <- round(((Staende_Ja*100)/23)/5)
 length_Staende_Nein <- round(((Staende_Nein*100)/23)/5)
 
-undertitel_balken_firstline <- paste0("<b>",
+undertitel_balken_firstline <- paste0('<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
+                                      strrep("&nbsp;",30),
+                                      "</b><b>Volk</b>",
                                       '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                      strrep("&nbsp;",20),
-                                      "</b>Volk",
-                                      '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                      strrep("&nbsp;",46),
-                                      "</b>Stände",
-                                      strrep("&nbsp;",22),
-                                      '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                      "</b>Stimmbeteiligung</b>"
+                                      strrep("&nbsp;",60),
+                                      "</b><b>Stände</b>"
                                       )
 
-undertitel_balken_secondline <- paste0("Ja ",gsub("[.]",",",Ja_Anteil),"% ",
+undertitel_balken_secondline <- paste0(strrep("&nbsp;",8),
+                                       "Ja ",gsub("[.]",",",Ja_Anteil),"% ",
                                        '<b style="background:	#89CFF0; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_yes),"</b>",
                                        '<b style="background:		#F88379; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_no),"</b>",
                                        " ",gsub("[.]",",",Nein_Anteil),"% Nein",
                                        '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                       strrep("&nbsp;",0),"</b>",
+                                       strrep("&nbsp;",10),"</b>",
                                        "Ja ",Staende_Ja," ",
                                        '<b style="background:	#89CFF0; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_Staende_Ja),"</b>",
                                        '<b style="background:		#F88379; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_Staende_Nein),"</b>",
-                                       " ",Staende_Nein," Nein",
-                                       '<b style="background:	#FFFFFF; color:black; padding:1px 3px">',
-                                       strrep("&nbsp;",0),"</b>",
-                                       '<b style="background:	#696969; color:black; padding:1px 6px">',
-                                       strrep("&nbsp;",length_stimmbeteiligung),"</b>",
-                                       '<b style="background:		#DCDCDC; color:black; padding:1px 6px">',
-                                       strrep("&nbsp;",20-length_stimmbeteiligung),"</b> ",
-                                       gsub("[.]",",",Stimmbeteiligung),"%"
+                                       " ",Staende_Nein," Nein"
                                        )
 
 undertitel_all <- paste0(undertitel_text,"<br><br>",
@@ -99,9 +89,20 @@ undertitel_all <- gsub('6px"></b> 0 Nein',
                        '0px"></b> 0 Nein',
                        undertitel_all)
 
+#Stimmbeteiligung
+block_stimmbeteiligung <- paste0('<b>Stimmbeteiligung</b><br>',
+                                 '<b style="background:	#FFFFFF; color:black; padding:1px 3px">',
+                                 strrep("&nbsp;",0),"</b>",
+                                 '<b style="background:	#696969; color:black; padding:1px 6px">',
+                                 strrep("&nbsp;",length_stimmbeteiligung),"</b>",
+                                 '<b style="background:		#DCDCDC; color:black; padding:1px 6px">',
+                                 strrep("&nbsp;",20-length_stimmbeteiligung),"</b><br>",
+                                 strrep("&nbsp;",10),
+                                 gsub("[.]",",",Stimmbeteiligung),"%")
+
 footer <- paste0('Quelle: BFS, Lena',
                  '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                 strrep("&nbsp;",25),
+                 strrep("&nbsp;",28),
                  "</b>Stand: ",format(Sys.time(),"%d.%m.%Y %H:%M Uhr"),
                  '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
                  strrep("&nbsp;",25),
@@ -163,8 +164,8 @@ zip::zip(zipfile = paste0('LENA_Kantone_',vorlagen_short[i],'_DEU.zip'),
          c(paste0("LENA_Kantone_",vorlagen_short[i],".eps"),paste0("LENA_Kantone_",vorlagen_short[i],".svg"),"preview.jpg","metadata.properties"), mode="cherry-pick")
 
 #Daten hochladen
-ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Kantone_',vorlagen_short[i],'_DEU.zip'))
-ftpUpload(paste0('LENA_Kantone_',vorlagen_short[i],'_DEU.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
+#ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Kantone_',vorlagen_short[i],'_DEU.zip'))
+#ftpUpload(paste0('LENA_Kantone_',vorlagen_short[i],'_DEU.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
 setwd("..")
 setwd("..")
@@ -223,8 +224,8 @@ zip::zip(zipfile = paste0('LENA_Gemeinden_',vorlagen_short[i],'_DEU.zip'),
          c(paste0("LENA_Gemeinden_",vorlagen_short[i],".eps"),paste0("LENA_Gemeinden_",vorlagen_short[i],".svg"),"preview.jpg","metadata.properties"), mode="cherry-pick")
 
 #Daten hochladen
-ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Gemeinden_',vorlagen_short[i],'_DEU.zip'))
-ftpUpload(paste0('LENA_Gemeinden_',vorlagen_short[i],'_DEU.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
+#ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Gemeinden_',vorlagen_short[i],'_DEU.zip'))
+#ftpUpload(paste0('LENA_Gemeinden_',vorlagen_short[i],'_DEU.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
 setwd("..")
 setwd("..")
@@ -236,41 +237,31 @@ titel <- vorlagen_fr$text[i]
 undertitel_text <- paste0("<b>Votation populaire du 15 mai 2022</b>")
 
 
-
-undertitel_balken_firstline <- paste0("<b>",
-                                      '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                      strrep("&nbsp;",10),
-                                      "</b>Majorité du peuple",
-                                      '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
+undertitel_balken_firstline <- paste0('<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
                                       strrep("&nbsp;",20),
-                                      "</b>Majorité des Cantons",
-                                      strrep("&nbsp;",6),
+                                      "</b><b>Majorité du peuple</b>",
                                       '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                      "</b>Taux de participation</b>"
+                                      strrep("&nbsp;",35),
+                                      "</b><b>Majorité des Cantons</b>"
 )
 
-undertitel_balken_secondline <- paste0("Oui ",gsub("[.]",",",Ja_Anteil),"% ",
+undertitel_balken_secondline <- paste0(strrep("&nbsp;",8),
+                                       "Oui ",gsub("[.]",",",Ja_Anteil),"% ",
                                        '<b style="background:	#89CFF0; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_yes),"</b>",
                                        '<b style="background:		#F88379; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_no),"</b>",
                                        " ",gsub("[.]",",",Nein_Anteil),"% Non",
-                                       '<b style="background:	#FFFFFF; color:black; padding:1px 4px">',
-                                       strrep("&nbsp;",0),"</b>",
+                                       '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
+                                       strrep("&nbsp;",10),"</b>",
                                        "Oui ",Staende_Ja," ",
                                        '<b style="background:	#89CFF0; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_Staende_Ja),"</b>",
                                        '<b style="background:		#F88379; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_Staende_Nein),"</b>",
-                                       " ",Staende_Nein," Non",
-                                       '<b style="background:	#FFFFFF; color:black; padding:1px 3px">',
-                                       strrep("&nbsp;",0),"</b>",
-                                       '<b style="background:	#696969; color:black; padding:1px 6px">',
-                                       strrep("&nbsp;",length_stimmbeteiligung),"</b>",
-                                       '<b style="background:		#DCDCDC; color:black; padding:1px 6px">',
-                                       strrep("&nbsp;",20-length_stimmbeteiligung),"</b>",
-                                       gsub("[.]",",",Stimmbeteiligung),"%"
+                                       " ",Staende_Nein," Non"
 )
+
 
 undertitel_all <- paste0(undertitel_text,"<br><br>",
                          undertitel_balken_firstline,
@@ -286,15 +277,25 @@ undertitel_all <- gsub('6px"></b> 0 Non',
                        '0px"></b> 0 Non',
                        undertitel_all)
 
+#Stimmbeteiligung
+block_stimmbeteiligung <- paste0('<b>Taux de participation</b><br>',
+                                 '<b style="background:	#FFFFFF; color:black; padding:1px 3px">',
+                                 strrep("&nbsp;",3),"</b>",
+                                 '<b style="background:	#696969; color:black; padding:1px 6px">',
+                                 strrep("&nbsp;",length_stimmbeteiligung),"</b>",
+                                 '<b style="background:		#DCDCDC; color:black; padding:1px 6px">',
+                                 strrep("&nbsp;",20-length_stimmbeteiligung),"</b><br>",
+                                 strrep("&nbsp;",13),
+                                 gsub("[.]",",",Stimmbeteiligung),"%")
+
 footer <- paste0('Source: OFS, Lena',
                  '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                 strrep("&nbsp;",22),
+                 strrep("&nbsp;",30),
                  "</b>Etat: ",format(Sys.time(),"%d.%m.%Y %Hh%M"),
                  '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
                  strrep("&nbsp;",22),
                  "</b>Infographie: Keystone-ATS"
                  )
-
 ###Vorlage kopieren
 new_chart <-dw_copy_chart(vorlage_kantone[2])
 
@@ -351,8 +352,8 @@ zip::zip(zipfile = paste0('LENA_Kantone_',vorlagen_short[i],'_FR.zip'),
          c(paste0("LENA_Kantone_",vorlagen_short[i],".eps"),paste0("LENA_Kantone_",vorlagen_short[i],".svg"),"preview.jpg","metadata.properties"), mode="cherry-pick")
 
 #Daten hochladen
-ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Kantone_',vorlagen_short[i],'_FR.zip'))
-ftpUpload(paste0('LENA_Kantone_',vorlagen_short[i],'_FR.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
+#ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Kantone_',vorlagen_short[i],'_FR.zip'))
+#ftpUpload(paste0('LENA_Kantone_',vorlagen_short[i],'_FR.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
 setwd("..")
 setwd("..")
@@ -414,8 +415,8 @@ zip::zip(zipfile = paste0('LENA_Gemeinden_',vorlagen_short[i],'_FR.zip'),
          c(paste0("LENA_Gemeinden_",vorlagen_short[i],".eps"),paste0("LENA_Gemeinden_",vorlagen_short[i],".svg"),"preview.jpg","metadata.properties"), mode="cherry-pick")
 
 #Daten hochladen
-ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Gemeinden_',vorlagen_short[i],'_FR.zip'))
-ftpUpload(paste0('LENA_Gemeinden_',vorlagen_short[i],'_FR.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
+#ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Gemeinden_',vorlagen_short[i],'_FR.zip'))
+#ftpUpload(paste0('LENA_Gemeinden_',vorlagen_short[i],'_FR.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
 setwd("..")
 setwd("..")
@@ -427,39 +428,29 @@ setwd("..")
 titel <- vorlagen_it$text[i]
 undertitel_text <- paste0("<b>Votatzione popolare del 15 maggio 2022</b>")
 
-undertitel_balken_firstline <- paste0("<b>",
+undertitel_balken_firstline <- paste0('<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
+                                      strrep("&nbsp;",28),
+                                      "</b><b>Popolo</b>",
                                       '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                      strrep("&nbsp;",20),
-                                      "</b>Popolo",
-                                      '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                      strrep("&nbsp;",35),
-                                      "</b>Cantoni",
-                                      strrep("&nbsp;",15),
-                                      '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                      "</b>Tasso di partecipazione</b>"
+                                      strrep("&nbsp;",58),
+                                      "</b><b>Cantoni</b>"
 )
 
-undertitel_balken_secondline <- paste0("sì ",gsub("[.]",",",Ja_Anteil),"% ",
+undertitel_balken_secondline <- paste0(strrep("&nbsp;",8),
+                                       "sì ",gsub("[.]",",",Ja_Anteil),"% ",
                                        '<b style="background:	#89CFF0; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_yes),"</b>",
                                        '<b style="background:		#F88379; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_no),"</b>",
                                        " ",gsub("[.]",",",Nein_Anteil),"% no",
                                        '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                       strrep("&nbsp;",0),"</b>",
+                                       strrep("&nbsp;",17),"</b>",
                                        "sì ",Staende_Ja," ",
                                        '<b style="background:	#89CFF0; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_Staende_Ja),"</b>",
                                        '<b style="background:		#F88379; color:black; padding:1px 6px">',
                                        strrep("&nbsp;",length_Staende_Nein),"</b>",
-                                       " ",Staende_Nein," no",
-                                       '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                                       strrep("&nbsp;",0),"</b>",
-                                       '<b style="background:	#696969; color:black; padding:1px 6px">',
-                                       strrep("&nbsp;",length_stimmbeteiligung),"</b>",
-                                       '<b style="background:		#DCDCDC; color:black; padding:1px 6px">',
-                                       strrep("&nbsp;",20-length_stimmbeteiligung),"</b> ",
-                                       gsub("[.]",",",Stimmbeteiligung),"%"
+                                       " ",Staende_Nein," no"
 )
 
 undertitel_all <- paste0(undertitel_text,"<br><br>",
@@ -476,9 +467,21 @@ undertitel_all <- gsub('6px"></b> 0 no',
                        '0px"></b> 0 no',
                        undertitel_all)
 
+
+#Stimmbeteiligung
+block_stimmbeteiligung <- paste0('<b>Tasso di partecipazione</b><br>',
+                                 '<b style="background:	#FFFFFF; color:black; padding:1px 3px">',
+                                 strrep("&nbsp;",6),"</b>",
+                                 '<b style="background:	#696969; color:black; padding:1px 6px">',
+                                 strrep("&nbsp;",length_stimmbeteiligung),"</b>",
+                                 '<b style="background:		#DCDCDC; color:black; padding:1px 6px">',
+                                 strrep("&nbsp;",20-length_stimmbeteiligung),"</b><br>",
+                                 strrep("&nbsp;",16),
+                                 gsub("[.]",",",Stimmbeteiligung),"%")
+
 footer <- paste0('Fonte: UTS, Lena',
                  '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
-                 strrep("&nbsp;",25),
+                 strrep("&nbsp;",32),
                  "</b>Stato: ",format(Sys.time(),"%d.%m.%Y %Hh%M"),
                  '<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
                  strrep("&nbsp;",25),
@@ -541,8 +544,8 @@ zip::zip(zipfile = paste0('LENA_Kantone_',vorlagen_short[i],'_IT.zip'),
          c(paste0("LENA_Kantone_",vorlagen_short[i],".eps"),paste0("LENA_Kantone_",vorlagen_short[i],".svg"),"preview.jpg","metadata.properties"), mode="cherry-pick")
 
 #Daten hochladen
-ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Kantone_',vorlagen_short[i],'_IT.zip'))
-ftpUpload(paste0('LENA_Kantone_',vorlagen_short[i],'_IT.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
+#ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Kantone_',vorlagen_short[i],'_IT.zip'))
+#ftpUpload(paste0('LENA_Kantone_',vorlagen_short[i],'_IT.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
 setwd("..")
 setwd("..")
@@ -607,170 +610,11 @@ zip::zip(zipfile = paste0('LENA_Gemeinden_',vorlagen_short[i],'_IT.zip'),
 
 #Daten hochladen
 
-ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Gemeinden_',vorlagen_short[i],'_IT.zip'))
-ftpUpload(paste0('LENA_Gemeinden_',vorlagen_short[i],'_IT.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
+#ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Gemeinden_',vorlagen_short[i],'_IT.zip'))
+#ftpUpload(paste0('LENA_Gemeinden_',vorlagen_short[i],'_IT.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
 setwd("..")
 setwd("..")
 
-
-}
-
-Organspende <- FALSE
-
-if (Organspende == TRUE) {
-
-
-#Organspendegrafik DE
-
-setwd("./Grafiken")
-
-#Create Folder
-folder_name <- "Organspende_DE"
-dir.create(folder_name)
-
-setwd(paste0("./",folder_name))
-
-#Als JPEG
-map <- dw_export_chart("19NdQ", plain=FALSE,border_width = 20)
-image_write(map,path="preview.jpg",format="jpeg")
-
-
-#Als SVG &  EPS
-map <- dw_export_chart("19NdQ", type="svg",plain=FALSE,border_width = 20)
-cat(map,file="Organspende_DE.svg")
-map <- charToRaw(map)
-rsvg_eps(map,"Organspende_DE.eps",width=4800)
-
-
-#Metadata
-metadata <- paste0("i5_object_name=KORRELATIONSGRAFIK ORGANSPENDEREGISTER D\n",
-                   "i55_date_created=",format(Sys.Date(),"%Y%m%d"),"\n",
-                   "i120_caption=INFOGRAFIK - Je mehr freiwillige Einträge ins Organspenderegister, desto grösser die Zustimmung zum Transplantationsgesetz. Diese Infografik wurde automatisiert vom Schreibroboter Lena erstellt.\n",
-                   "i103_original_transmission_reference=\n",
-                   "i90_city=\n",
-                   "i100_country_code=CHE\n",
-                   "i15_category=N\n",
-                   "i105_headline=Politik, Wirtschaft\n",
-                   "i40_special_instructions=Die Infografik kann im Grafikformat EPS und SVG bezogen werden. Diese Infografik wurde automatisiert vom Schreibroboter Lena erstellt.\n",
-                   "i110_credit=KEYSTONE\n",
-                   "i115_source=KEYSTONE\n",
-                   "i80_byline=Lena\n",
-                   "i122_writer=Lena\n")
-
-cat(metadata,file="metadata.properties")
-
-#Zip-File erstellen
-zip::zip(zipfile = 'Organspende_DEU.zip', 
-         c("Organspende_DE.eps","Organspende_DE.svg","preview.jpg","metadata.properties"), mode="cherry-pick")
-
-#Daten hochladen
-#ftp_adress <- paste0("ftp://ftp.keystone.ch/",'Organspende_DEU.zip')
-#ftpUpload('Organspende_DEU.zip', ftp_adress,userpwd="keyg_in:5r6368vz")
-
-setwd("..")
-setwd("..")
-
-
-#Organspendegrafik FR
-
-setwd("./Grafiken")
-
-#Create Folder
-folder_name <- "Organspende_FR"
-dir.create(folder_name)
-
-setwd(paste0("./",folder_name))
-
-#Als JPEG
-map <- dw_export_chart("1X64P", plain=FALSE,border_width = 20)
-image_write(map,path="preview.jpg",format="jpeg")
-
-
-#Als SVG &  EPS
-map <- dw_export_chart("1X64P", type="svg",plain=FALSE,border_width = 20)
-cat(map,file="Organspende_FR.svg")
-map <- charToRaw(map)
-rsvg_eps(map,"Organspende_FR.eps",width=4800)
-
-
-#Metadata
-metadata <- paste0("i5_object_name=KORRELATIONSGRAFIK ORGANSPENDEREGISTER F\n",
-                   "i55_date_created=",format(Sys.Date(),"%Y%m%d"),"\n",
-                   "i120_caption=INFOGRAPHIE - Plus il y a d'inscriptions volontaires au registre des donneurs d'organes, plus l'approbation de la loi sur la transplantation est forte. Cette infographie a été réalisée de manière automatisée par le robot d'écriture Lena.\n",
-                   "i103_original_transmission_reference=\n",
-                   "i90_city=\n",
-                   "i100_country_code=CHE\n",
-                   "i15_category=N\n",
-                   "i105_headline=Politik, Wirtschaft\n",
-                   "i40_special_instructions=L'infographie peut être obtenue aux formats graphiques EPS et SVG. Cette infographie a été réalisée de manière automatisée par le robot d'écriture Lena.\n",
-                   "i110_credit=KEYSTONE\n",
-                   "i115_source=KEYSTONE\n",
-                   "i80_byline=Lena\n",
-                   "i122_writer=Lena\n")
-
-cat(metadata,file="metadata.properties")
-
-#Zip-File erstellen
-zip::zip(zipfile = 'Organspende_FR.zip', 
-         c("Organspende_FR.eps","Organspende_FR.svg","preview.jpg","metadata.properties"), mode="cherry-pick")
-
-#Daten hochladen
-#ftp_adress <- paste0("ftp://ftp.keystone.ch/",'Organspende_FR.zip')
-#ftpUpload('Organspende_FR.zip', ftp_adress,userpwd="keyg_in:5r6368vz")
-
-setwd("..")
-setwd("..")
-
-
-#Organspendegrafik IT
-
-setwd("./Grafiken")
-
-#Create Folder
-folder_name <- "Organspende_IT"
-dir.create(folder_name)
-
-setwd(paste0("./",folder_name))
-
-#Als JPEG
-map <- dw_export_chart("lHQVh", plain=FALSE,border_width = 20)
-image_write(map,path="preview.jpg",format="jpeg")
-
-
-#Als SVG &  EPS
-map <- dw_export_chart("lHQVh", type="svg",plain=FALSE,border_width = 20)
-cat(map,file="Organspende_IT.svg")
-map <- charToRaw(map)
-rsvg_eps(map,"Organspende_IT.eps",width=4800)
-
-
-#Metadata
-metadata <- paste0("i5_object_name=KORRELATIONSGRAFIK ORGANSPENDEREGISTER I\n",
-                   "i55_date_created=",format(Sys.Date(),"%Y%m%d"),"\n",
-                   "i120_caption=INFOGRAPHIE - Più ci sono iscrizioni volontarie al registro di donazione organi, più la legge sui trapianti è accettata. Questa infografica è stata creata automaticamente dal robot di scrittura Lena.\n",
-                   "i103_original_transmission_reference=\n",
-                   "i90_city=\n",
-                   "i100_country_code=CHE\n",
-                   "i15_category=N\n",
-                   "i105_headline=Politik, Wirtschaft\n",
-                   "i40_special_instructions=L'infografica può essere ottenuta nei formati grafici EPS e SVG. Questa infografica è stata creata automaticamente dal robot di scrittura Lena.\n",
-                   "i110_credit=KEYSTONE\n",
-                   "i115_source=KEYSTONE\n",
-                   "i80_byline=Lena\n",
-                   "i122_writer=Lena\n")
-
-cat(metadata,file="metadata.properties")
-
-#Zip-File erstellen
-zip::zip(zipfile = 'Organspende_IT.zip', 
-         c("Organspende_IT.eps","Organspende_IT.svg","preview.jpg","metadata.properties"), mode="cherry-pick")
-
-#Daten hochladen
-#ftp_adress <- paste0("ftp://ftp.keystone.ch/",'Organspende_IT.zip')
-#ftpUpload('Organspende_IT.zip', ftp_adress,userpwd="keyg_in:5r6368vz")
-
-setwd("..")
-setwd("..")
 
 }

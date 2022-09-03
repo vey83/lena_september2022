@@ -19,10 +19,11 @@ cat("Benoetigte Bibliotheken geladen\n")
 abstimmung_date <- "September2022"
 
 #Link zu JSON-Daten / Daten einlesen
-link_json <- "https://app-prod-static-voteinfo.s3.eu-central-1.amazonaws.com/v1/ogd/sd-t-17-02-20220515-eidgAbstimmung.json" 
+#link_json <- "https://app-prod-static-voteinfo.s3.eu-central-1.amazonaws.com/v1/ogd/sd-t-17-02-20220515-eidgAbstimmung.json" 
+link_json <- "https://app-prod-static-voteinfo.s3.eu-central-1.amazonaws.com/v1/ogd/sd-t-17-02-20220925-eidgAbstimmung.json" 
 json_data <- fromJSON(link_json, flatten = TRUE)
 
-link_json_kantone <- "https://app-prod-static-voteinfo.s3.eu-central-1.amazonaws.com/v1/ogd/sd-t-17-02-20220515-kantAbstimmung.json"
+link_json_kantone <- "https://app-prod-static-voteinfo.s3.eu-central-1.amazonaws.com/v1/ogd/sd-t-17-02-20220925-kantAbstimmung.json"
 json_data_kantone <- fromJSON(link_json_kantone, flatten = TRUE)
 
 cat("Aktuelle Abstimmungsdaten geladen\n")
@@ -31,18 +32,17 @@ cat("Aktuelle Abstimmungsdaten geladen\n")
 vorlagen_short <- c("Massentierhaltung","AHV_Mehrwertsteuer","AHV_Rentenalter","Verrechnungssteuer")
 
 ###Kurznamen und Nummern kantonale Vorlagen
-kantonal_short <- c("BE_Stimmrecht16","NE_Soins_Dentaires","ZH_Kreislauf","ZH_Steuergeschenke")
+kantonal_short <- c("ZH_Steuergeschenke","ZH_Kreislauf","BE_Stimmrecht16","VD_Conseil","NE_Soins_Dentaires")
 
 #Nummer in JSON 
-kantonal_number <- c(1,1,1,1,4,12,13) 
+kantonal_number <- c(1,1,2,11,12) 
 
 #Falls mehrere Vorlagen innerhalb eines Kantons, Vorlage auswaehlen
-kantonal_add <- c(1,2,3,4,1,1,1)
+kantonal_add <- c(1,2,1,1,1)
 
 
 ###Vorhandene Daten laden
-#daten_tierversuche_bfs <- read_excel("Data/daten_tierversuche_bfs.xlsx")
-#daten_tabak_bfs <- read_excel("Data/daten_tabak_bfs.xlsx")
+daten_altersvorsorge_bfs <- read_excel("Data/daten_altersvorsorge_bfs.xlsx")
 
 #cat("Daten zu historischen Abstimmungen geladen\n")
 
