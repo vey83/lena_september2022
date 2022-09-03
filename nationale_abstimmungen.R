@@ -10,14 +10,14 @@ for (i in 1:length(vorlagen_short)) {
   results_national <- get_results(json_data,i,level="national")
   
 ###Nationale Resultate simulieren
-#set.seed(i)
-#results_national$jaStimmenInProzent <- sample(0:100,1)
+set.seed(i)
+results_national$jaStimmenInProzent <- sample(0:100,1)
 
   ###Resultate aus JSON auslesen für Gemeinden
   results <- get_results(json_data,i)
   
 #Simulation Gemeinden
-#source("data_simulation_gemeinden.R")
+source("data_simulation_gemeinden.R")
   
   #Daten anpassen Gemeinden
   results <- treat_gemeinden(results)
@@ -27,7 +27,7 @@ for (i in 1:length(vorlagen_short)) {
   results_kantone <- get_results(json_data,i,"cantonal")
   
 #Simulation Kantone
-#source("data_simulation_kantone.R")
+source("data_simulation_kantone.R")
   
   Ja_Stimmen_Kanton <- results_kantone %>%
     select(Kantons_Nr,jaStimmenInProzent) %>%
@@ -84,8 +84,12 @@ for (i in 1:length(vorlagen_short)) {
     other_check <- TRUE
     if (vorlagen$id[i] == "6590") {
       results_othervote <- get_results(json_data,i+1)
+#Simulation Gemeinden
+source("data_simulation_gemeinden_other.R")
     } else if (vorlagen$id[i] == "6600") {
       results_othervote <- get_results(json_data,i-1)
+#Simulation Gemeinden
+source("data_simulation_gemeinden_other.R")     
     }
     results_othervote <- results_othervote %>%
       select(Gemeinde_Nr,
@@ -105,7 +109,6 @@ for (i in 1:length(vorlagen_short)) {
       hist_check <- TRUE 
       data_hist <- format_data_hist(daten_altersvorsorge_bfs)
       results <- merge(results,data_hist,all.x = TRUE)
-    
       if (other_check == FALSE) {
       results <- hist_storyfinder(results)
       } else {
@@ -231,7 +234,10 @@ for (i in 1:length(vorlagen_short)) {
   undertitel_de <- "Es sind noch keine Gemeinden ausgezählt."
   undertitel_fr <- "Aucun résultat n'est encore connu."
   undertitel_it <- "Nessun risultato è ancora noto."
-  
+
+hold <- TRUE
+if (hold == FALSE) {
+   
   if (sum(results$Gebiet_Ausgezaehlt) > 0 ) {
     
     undertitel_de <- paste0("Es sind <b>",sum(results$Gebiet_Ausgezaehlt),"</b> von <b>",nrow(results),
@@ -249,7 +255,7 @@ for (i in 1:length(vorlagen_short)) {
                             round(results_national$jaStimmenInProzent,1)," %</b> sì, <b>",
                             round(100-results_national$jaStimmenInProzent,1)," %</b> no")
 
- 
+  }  
     #Karten Gemeinden
     dw_edit_chart(datawrapper_codes[i,2],intro=undertitel_de,annotate=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%d.%m.%Y %H:%M Uhr")))
     dw_publish_chart(datawrapper_codes[i,2])
@@ -269,8 +275,7 @@ for (i in 1:length(vorlagen_short)) {
     
     dw_edit_chart(datawrapper_codes[i,7],intro=undertitel_it,annotate=paste0("Ultimo aggiornamento: ",format(Sys.time(),"%d.%m.%Y %H:%M")))
     dw_publish_chart(datawrapper_codes[i,7])
-    
-  }  
+}  
 
 #Eintrag für Uebersicht
 uebersicht_text_de <- paste0("<b>",vorlagen$text[i],"</b><br>",
@@ -317,6 +322,7 @@ data_overview <- data_overview[-1,]
 write.csv(data_overview,"Output/Uebersicht_dw.csv", na = "", row.names = FALSE, fileEncoding = "UTF-8")
 
 #Charts Uebersicht
+dw_data_to_chart(data_overview,"O1i9P")
 dw_edit_chart("O1i9P",intro=paste0("Letzte Aktualisierung: ",format(Sys.time(),"%H:%M Uhr")))
 dw_publish_chart("O1i9P")
 
