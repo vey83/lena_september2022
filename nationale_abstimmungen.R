@@ -221,7 +221,7 @@ if (vorlagen$id[i] == "6590" || vorlagen$id[i] == "6600") {
   undertitel_fr <- "Aucun résultat n'est encore connu."
   undertitel_it <- "Nessun risultato è ancora noto."
 
-hold <- TRUE
+hold <- FALSE
 if (hold == FALSE) {
    
   if (sum(results$Gebiet_Ausgezaehlt) > 0 ) {

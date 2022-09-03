@@ -143,32 +143,30 @@ for (v in 1:length(vorlagen_short)) {
 
 #Vorlagen für Erstellung der Kantone
 for (v in 1:length(vorlagen_short)) {
-  
+
   #Gemeinden  
-    data_chart <- dw_copy_chart(vorlagen_gemeinden[i])
+    data_chart <- dw_copy_chart(vorlagen_gemeinden[1])
     dw_edit_chart(data_chart$id,
                   title=vorlagen_all$text[v],
-                  intro = "",
-                  annotate = "",
-                  folderId = folder_vorlagen_de$id,
+                  intro = "&nbsp;",
+                  annotate = "&nbsp;",
+                  folderId = 116284,
                   data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",
                                                    tolower(monate_de[month(date_voting)]),year(date_voting),
                                                    "/master/Output/",vorlagen_short[v],"_dw.csv")))
     dw_publish_chart(data_chart$id)
-    metadata_chart <- dw_retrieve_chart_metadata(data_chart$id)
 
-    data_chart <- dw_copy_chart(vorlagen_gemeinden[i])
+    data_chart <- dw_copy_chart(vorlagen_gemeinden[2])
     dw_edit_chart(data_chart$id,
                   title=vorlagen_all$text[v+4],
-                  intro = "",
-                  annotate = "",
-                  folderId = folder_vorlagen_fr$id,
+                  intro = "&nbsp;",
+                  annotate = "&nbsp;",
+                  folderId = 116285,
                   data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",
                                                    tolower(monate_de[month(date_voting)]),year(date_voting),
                                                    "/master/Output/",vorlagen_short[v],"_dw.csv")))
     dw_publish_chart(data_chart$id)
-    metadata_chart <- dw_retrieve_chart_metadata(data_chart$id)
-}  
+}
 
 #Daten Speichern
 library(xlsx)
