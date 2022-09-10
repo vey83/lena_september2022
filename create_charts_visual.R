@@ -4,27 +4,35 @@ library(DatawRappr)
 library(zip)
 library(RCurl)
 
+#Working Directory definieren
+setwd("C:/Users/simon/OneDrive/LENA_Project/lena_september2022")
+
+###Config: Bibliotheken laden, Pfade/Links definieren, bereits vorhandene Daten laden
+source("config.R",encoding = "UTF-8")
+source("functions_readin.R", encoding = "UTF-8")
+
 #Vorlagen Codes
 vorlage_gemeinde <- c("kDkMR","5NIK3","Idw6B")
 vorlage_kantone <- c("Tfr6N","qI7hZ","GAF2u")
 
+#Ordner Codes
+folder_de <- "117142"
+folder_fr <- "117143"
+folder_it <- "117144"
 
-#Aktueller Abstimmungslink
-link_json <- "https://app-prod-static-voteinfo.s3.eu-central-1.amazonaws.com/v1/ogd/sd-t-17-02-20220515-eidgAbstimmung.json" 
-json_data <- fromJSON(link_json, flatten = TRUE)
+#Datum
+datum_de <- "25. September 2022"
+datum_fr <- "25 septembre 2022"
+datum_it <- "25 settembre 2022"
 
-#Vorlagen umbenennen
-vorlagen$text[1] <- "Änderung des Filmgesetzes"
-vorlagen$text[2] <- "Änderung des Transplantationsgesetzes"
-vorlagen$text[3] <- "Ausbau von Frontex"
+#Vorlagen einlesen und Klammern entfernen
+vorlagen <- get_vorlagen(json_data,"de")
+vorlagen_fr <- get_vorlagen(json_data,"fr")
+vorlagen_it <- get_vorlagen(json_data,"it")
 
-vorlagen_fr$text[1] <- "Modification de la loi sur le cinéma"
-vorlagen_fr$text[2] <- "Modification de la loi sur la transplantation"
-vorlagen_fr$text[3] <- "Développement de Frontex"
-
-vorlagen_it$text[1] <- "Modifica della legge sul cinema"
-vorlagen_it$text[2] <- "Modifica della legge sui trapianti"
-vorlagen_it$text[3] <- "Ampliamento di Frontex"
+vorlagen$text <- str_replace(vorlagen$text, "\\s*\\([^\\)]+\\)", "")
+vorlagen_fr$text <- str_replace(vorlagen_fr$text, "\\s*\\([^\\)]+\\)", "")
+vorlagen_it$text <- str_replace(vorlagen_it$text, "\\s*\\([^\\)]+\\)", "")
 
 for (i in 1:length(vorlagen_short) ) {
 
@@ -41,7 +49,7 @@ Staende_Nein <- results_national$neinStaendeGanz+(results_national$neinStaendeHa
 
 ###Flexible Grafik-Bausteine erstellen
 titel <- vorlagen$text[i]
-undertitel_text <- paste0("<b>Eidgenössische Volksabstimmung vom 15. Mai 2022</b>")
+undertitel_text <- paste0("<b>Eidgenössische Volksabstimmung vom ",datum_de,"</b>")
 
 #Undertitel Balken
 length_yes <- round(Ja_Anteil/5)
@@ -116,9 +124,9 @@ new_chart <-dw_copy_chart(vorlage_kantone[1])
 dw_edit_chart(new_chart$id,title=titel,
               intro=undertitel_all,
               annotate=footer,
-              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_mai2022/master/Output/",vorlagen_short[i],"_dw_kantone.csv")),
+              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",tolower(abstimmung_date),"/master/Output/",vorlagen_short[i],"_dw_kantone.csv")),
               axes=list("values"="Kanton_color"),
-              folderId = "101954")
+              folderId = folder_de)
 
 ###Bilddaten speichen und hochladen für Kanton
 
@@ -143,9 +151,9 @@ rsvg_eps(map,paste0("LENA_Kantone_",vorlagen_short[i],".eps"),width=4800)
 
 
 #Metadata
-metadata <- paste0("i5_object_name=SCHWEIZ ABSTIMMUNGEN ",vorlagen_short[i]," D\n",
+metadata <- paste0("i5_object_name=SCHWEIZ ABSTIMMUNGEN ",toupper(titel),"\n",
                    "i55_date_created=",format(Sys.Date(),"%Y%m%d"),"\n",
-                   "i120_caption=INFOGRAFIK - Eidgenoessische Volksabstimmung vom 15. Mai 2022 - ",titel,". Diese Infografik wurde automatisiert vom Schreibroboter Lena erstellt.\n",
+                   "i120_caption=INFOGRAFIK - Eidgenoessische Volksabstimmung vom ",datum_de," - ",titel,". Diese Infografik wurde automatisiert vom Schreibroboter Lena erstellt.\n",
                    "i103_original_transmission_reference=\n",
                    "i90_city=\n",
                    "i100_country_code=CHE\n",
@@ -167,9 +175,11 @@ zip::zip(zipfile = paste0('LENA_Kantone_',vorlagen_short[i],'_DEU.zip'),
 #ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Kantone_',vorlagen_short[i],'_DEU.zip'))
 #ftpUpload(paste0('LENA_Kantone_',vorlagen_short[i],'_DEU.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
-setwd("..")
-setwd("..")
+#Chart löschen
+dw_delete_chart(new_chart$id)
 
+setwd("..")
+setwd("..")
 
 ###Vorlage kopieren
 new_chart <-dw_copy_chart(vorlage_gemeinde[1])
@@ -178,9 +188,9 @@ new_chart <-dw_copy_chart(vorlage_gemeinde[1])
 dw_edit_chart(new_chart$id,title=titel,
               intro=undertitel_text,
               annotate=footer,
-              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_mai2022/master/Output/",vorlagen_short[i],"_dw.csv")),
+              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",tolower(abstimmung_date),"/master/Output/",vorlagen_short[i],"_dw.csv")),
               axes=list("values"="Gemeinde_color"),
-              folderId = "101954")
+              folderId = folder_de)
 
 
 ##Bilddaten speichen und hochladen für Gemeinde
@@ -203,9 +213,9 @@ map <- charToRaw(map)
 rsvg_eps(map,paste0("LENA_Gemeinden_",vorlagen_short[i],".eps"),width=4800)
 
 #Metadata
-metadata <- paste0("i5_object_name=SCHWEIZ ABSTIMMUNGEN GEMEINDEN ",vorlagen_short[i]," D\n",
+metadata <- paste0("i5_object_name=SCHWEIZ ABSTIMMUNGEN GEMEINDEN ",toupper(titel),"\n",
                    "i55_date_created=",format(Sys.Date(),"%Y%m%d"),"\n",
-                   "i120_caption=INFOGRAFIK - Eidgenoessische Volksabstimmung vom 15. Mai 2022 Resultate Gemeinden - ",titel,". Diese Infografik wurde automatisiert vom Schreibroboter Lena erstellt.\n",
+                   "i120_caption=INFOGRAFIK - Eidgenoessische Volksabstimmung vom ",datum_de," Resultate Gemeinden - ",titel,". Diese Infografik wurde automatisiert vom Schreibroboter Lena erstellt.\n",
                    "i103_original_transmission_reference=\n",
                    "i90_city=\n",
                    "i100_country_code=CHE\n",
@@ -227,6 +237,9 @@ zip::zip(zipfile = paste0('LENA_Gemeinden_',vorlagen_short[i],'_DEU.zip'),
 #ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Gemeinden_',vorlagen_short[i],'_DEU.zip'))
 #ftpUpload(paste0('LENA_Gemeinden_',vorlagen_short[i],'_DEU.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
+#Chart löschen
+dw_delete_chart(new_chart$id)
+
 setwd("..")
 setwd("..")
 
@@ -234,7 +247,7 @@ setwd("..")
 
 ###Flexible Grafik-Bausteine erstellen
 titel <- vorlagen_fr$text[i]
-undertitel_text <- paste0("<b>Votation populaire du 15 mai 2022</b>")
+undertitel_text <- paste0("<b>Votation populaire du ",datum_fr,"</b>")
 
 
 undertitel_balken_firstline <- paste0('<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
@@ -305,10 +318,10 @@ dw_edit_chart(new_chart$id,title=titel,
               language="fr-CH",
               intro=undertitel_all,
               annotate=footer,
-              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_mai2022/master/Output/",vorlagen_short[i],"_dw_kantone.csv")),
+              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",tolower(abstimmung_date),"/master/Output/",vorlagen_short[i],"_dw_kantone.csv")),
               axes=list("values"="Kanton_color"),
               visualize = list("legend"=list("title"="Proportion de Oui")),
-              folderId = "101954")
+              folderId = folder_fr)
 
 ###Bilddaten speichen und hochladen für Kanton
 
@@ -331,9 +344,9 @@ map <- charToRaw(map)
 rsvg_eps(map,paste0("LENA_Kantone_",vorlagen_short[i],".eps"),width=4800)
 
 #Metadata
-metadata <- paste0("i5_object_name=SCHWEIZ ABSTIMMUNGEN ",vorlagen_short[i]," F\n",
+metadata <- paste0("i5_object_name=SUISSE VOTATION POPULAIRE ",toupper(titel),"\n",
                    "i55_date_created=",format(Sys.Date(),"%Y%m%d"),"\n",
-                   "i120_caption=INFOGRAPHIE - Votation populaire du 15 mai 2022 - ",titel,". Cette infographie a été réalisée de manière automatisée par le robot d'écriture Lena.\n",
+                   "i120_caption=INFOGRAPHIE - Votation populaire du ",datum_fr," - ",titel,". Cette infographie a été réalisée de manière automatisée par le robot d'écriture Lena.\n",
                    "i103_original_transmission_reference=\n",
                    "i90_city=\n",
                    "i100_country_code=CHE\n",
@@ -355,6 +368,9 @@ zip::zip(zipfile = paste0('LENA_Kantone_',vorlagen_short[i],'_FR.zip'),
 #ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Kantone_',vorlagen_short[i],'_FR.zip'))
 #ftpUpload(paste0('LENA_Kantone_',vorlagen_short[i],'_FR.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
+#Chart löschen
+dw_delete_chart(new_chart$id)
+
 setwd("..")
 setwd("..")
 
@@ -367,10 +383,10 @@ dw_edit_chart(new_chart$id,title=titel,
               language="fr-CH",
               intro=undertitel_text,
               annotate=footer,
-              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_mai2022/master/Output/",vorlagen_short[i],"_dw.csv")),
+              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",tolower(abstimmung_date),"/master/Output/",vorlagen_short[i],"_dw.csv")),
               axes=list("values"="Gemeinde_color"),
               visualize = list("legend"=list("title"="Proportion de Oui")),
-              folderId = "101954")
+              folderId = folder_fr)
 
 
 ##Bilddaten speichen und hochladen für Gemeinde
@@ -393,9 +409,9 @@ map <- charToRaw(map)
 rsvg_eps(map,paste0("LENA_Gemeinden_",vorlagen_short[i],".eps"),width=4800)
 
 #Metadata
-metadata <- paste0("i5_object_name=SCHWEIZ ABSTIMMUNGEN GEMEINDEN ",vorlagen_short[i]," F\n",
+metadata <- paste0("i5_object_name=SUISSE VOTATION POPULAIRE COMMUNES ",toupper(titel),"\n",
                    "i55_date_created=",format(Sys.Date(),"%Y%m%d"),"\n",
-                   "i120_caption=INFOGRAPHIE - Votation populaire du 15 mai 2022 - ",titel,". Cette infographie a été réalisée de manière automatisée par le robot d'écriture Lena.\n",
+                   "i120_caption=INFOGRAPHIE - Votation populaire du ",datum_fr," - ",titel,". Cette infographie a été réalisée de manière automatisée par le robot d'écriture Lena.\n",
                    "i103_original_transmission_reference=\n",
                    "i90_city=\n",
                    "i100_country_code=CHE\n",
@@ -418,6 +434,9 @@ zip::zip(zipfile = paste0('LENA_Gemeinden_',vorlagen_short[i],'_FR.zip'),
 #ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Gemeinden_',vorlagen_short[i],'_FR.zip'))
 #ftpUpload(paste0('LENA_Gemeinden_',vorlagen_short[i],'_FR.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
+#Chart löschen
+dw_delete_chart(new_chart$id)
+
 setwd("..")
 setwd("..")
 
@@ -426,7 +445,7 @@ setwd("..")
 
 ###Flexible Grafik-Bausteine erstellen
 titel <- vorlagen_it$text[i]
-undertitel_text <- paste0("<b>Votatzione popolare del 15 maggio 2022</b>")
+undertitel_text <- paste0("<b>Votatzione popolare del ",datum_it,"</b>")
 
 undertitel_balken_firstline <- paste0('<b style="background:	#FFFFFF; color:black; padding:1px 6px">',
                                       strrep("&nbsp;",28),
@@ -497,10 +516,10 @@ dw_edit_chart(new_chart$id,title=titel,
               language="it-CH",
               intro=undertitel_all,
               annotate=footer,
-              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_mai2022/master/Output/",vorlagen_short[i],"_dw_kantone.csv")),
+              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",tolower(abstimmung_date),"/master/Output/",vorlagen_short[i],"_dw_kantone.csv")),
               axes=list("values"="Kanton_color"),
               visualize = list("legend"=list("title"="Proporzione di sì")),
-              folderId = "101954")
+              folderId = folder_it)
 
 ###Bilddaten speichen und hochladen für Kanton
 
@@ -523,9 +542,9 @@ map <- charToRaw(map)
 rsvg_eps(map,paste0("LENA_Kantone_",vorlagen_short[i],".eps"),width=4800)
 
 #Metadata
-metadata <- paste0("i5_object_name=SCHWEIZ ABSTIMMUNGEN ",vorlagen_short[i]," I\n",
+metadata <- paste0("i5_object_name=SVIZZERA VOTATZIONE POPOLARE ",toupper(titel),"\n",
                    "i55_date_created=",format(Sys.Date(),"%Y%m%d"),"\n",
-                   "i120_caption=INFOGRAPHIE - Votatzione popolare del 15 maggio 2022 - ",titel,". Questa infografica è stata creata automaticamente dal robot di scrittura Lena.\n",
+                   "i120_caption=INFOGRAPHIE - Votatzione popolare del ",datum_it," - ",titel,". Questa infografica è stata creata automaticamente dal robot di scrittura Lena.\n",
                    "i103_original_transmission_reference=\n",
                    "i90_city=\n",
                    "i100_country_code=CHE\n",
@@ -547,6 +566,9 @@ zip::zip(zipfile = paste0('LENA_Kantone_',vorlagen_short[i],'_IT.zip'),
 #ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Kantone_',vorlagen_short[i],'_IT.zip'))
 #ftpUpload(paste0('LENA_Kantone_',vorlagen_short[i],'_IT.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
 
+#Chart löschen
+dw_delete_chart(new_chart$id)
+
 setwd("..")
 setwd("..")
 
@@ -560,10 +582,10 @@ dw_edit_chart(new_chart$id,title=titel,
               language="it-CH",
               intro=undertitel_text,
               annotate=footer,
-              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_mai2022/master/Output/",vorlagen_short[i],"_dw.csv")),
+              data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",tolower(abstimmung_date),"/master/Output/",vorlagen_short[i],"_dw.csv")),
               axes=list("values"="Gemeinde_color"),
               visualize = list("legend"=list("title"="Proporzione di sì")),
-              folderId = "101954")
+              folderId = folder_it)
 
 metadata <- dw_retrieve_chart_metadata(new_chart$id)
 
@@ -588,9 +610,9 @@ map <- charToRaw(map)
 rsvg_eps(map,paste0("LENA_Gemeinden_",vorlagen_short[i],".eps"),width=4800)
 
 #Metadata
-metadata <- paste0("i5_object_name=SCHWEIZ ABSTIMMUNGEN GEMEINDEN ",vorlagen_short[i]," I\n",
+metadata <- paste0("i5_object_name=VIZZERA VOTATZIONE POPOLARE COMUNI ",toupper(titel),"\n",
                    "i55_date_created=",format(Sys.Date(),"%Y%m%d"),"\n",
-                   "i120_caption=INFOGRAPHIE - Votatzione popolare del 15 maggio 2022 - ",titel,". Questa infografica è stata creata automaticamente dal robot di scrittura Lena.\n",
+                   "i120_caption=INFOGRAPHIE - Votatzione popolare del ",datum_it," - ",titel,". Questa infografica è stata creata automaticamente dal robot di scrittura Lena.\n",
                    "i103_original_transmission_reference=\n",
                    "i90_city=\n",
                    "i100_country_code=CHE\n",
@@ -612,6 +634,9 @@ zip::zip(zipfile = paste0('LENA_Gemeinden_',vorlagen_short[i],'_IT.zip'),
 
 #ftp_adress <- paste0("ftp://ftp.keystone.ch/",paste0('LENA_Gemeinden_',vorlagen_short[i],'_IT.zip'))
 #ftpUpload(paste0('LENA_Gemeinden_',vorlagen_short[i],'_IT.zip'), ftp_adress,userpwd="keyg_in:5r6368vz")
+
+#Chart löschen
+dw_delete_chart(new_chart$id)
 
 setwd("..")
 setwd("..")
