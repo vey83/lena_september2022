@@ -12,6 +12,7 @@ library(jsonlite)
 library(readxl)
 library(git2r)
 library(DatawRappr)
+library(lubridate)
 
 cat("Benoetigte Bibliotheken geladen\n")
 

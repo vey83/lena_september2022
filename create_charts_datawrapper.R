@@ -53,10 +53,6 @@ folder_vorlagen <- dw_create_folder("Vorlagen",parent_id = folder_kantone$id)
 folder_vorlagen_de <- dw_create_folder("Deutsch",parent_id = folder_vorlagen$id)
 folder_vorlagen_fr <- dw_create_folder("Französisch",parent_id = folder_vorlagen$id)
 
-for (k in kantonal_short) {
-dw_create_folder(k,parent_id = folder_kantonal$id)  
-}  
-
 ###Grafiken erstellen und Daten speichern
 grafiken_uebersicht <- data.frame("Typ","Vorlage","Titel","Sprache","ID","Link","Iframe")
 colnames(grafiken_uebersicht) <- c("Typ","Vorlage","Titel","Sprache","ID","Link","Iframe")
@@ -133,13 +129,45 @@ for (v in 1:length(vorlagen_short)) {
                           metadata_chart$content$metadata$publish$`embed-codes`$`embed-method-responsive`)
   colnames(new_entry) <- c("Typ","Vorlage","Titel","Sprache","ID","Link","Iframe")
   grafiken_uebersicht <- rbind(grafiken_uebersicht,new_entry)
-  
-  
-  
-  
   }
-  
 }  
+
+
+###Kantonale Abstimmungen
+#Sprache definieren
+kantonal_sprachen <- c(1,1,2,2,2)
+
+for (k in 1:length(kantonal_short)) {
+  data_chart <- dw_copy_chart(vorlagen_gemeinden[kantonal_sprachen[k]])
+  created_folder <- dw_create_folder(kantonal_short[k],parent_id = folder_kantonal$id)
+  titel <- json_data_kantone[["kantone"]][["vorlagen"]][[kantonal_number[k]]][["vorlagenTitel"]][[kantonal_add[k]]][["text"]][kantonal_sprachen[k]]
+  dw_edit_chart(data_chart$id,
+                title=titel,
+                intro = "&nbsp;",
+                annotate = "&nbsp;",
+                folderId = created_folder$id,
+                data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",
+                                                 tolower(monate_de[month(date_voting)]),year(date_voting),
+                                                 "/master/Output/",kantonal_short[k],"_dw.csv")),
+                visualize=list("hide-empty-regions" = TRUE))
+  
+  dw_publish_chart(data_chart$id)
+  metadata_chart <- dw_retrieve_chart_metadata(data_chart$id)
+ 
+  new_entry <- data.frame("Kantonale Vorlage",
+                          kantonal_short[k],
+                          metadata_chart$content$title,
+                          metadata_chart$content$language,
+                          metadata_chart$id,
+                          metadata_chart$content$publicUrl,
+                          metadata_chart$content$metadata$publish$`embed-codes`$`embed-method-responsive`)
+  colnames(new_entry) <- c("Typ","Vorlage","Titel","Sprache","ID","Link","Iframe")
+  grafiken_uebersicht <- rbind(grafiken_uebersicht,new_entry)
+}
+
+#Daten Speichern
+library(xlsx)
+write.xlsx(grafiken_uebersicht,"./Data/metadaten_grafiken.xlsx",row.names = FALSE)
 
 #Vorlagen für Erstellung der Kantone
 for (v in 1:length(vorlagen_short)) {
@@ -150,7 +178,7 @@ for (v in 1:length(vorlagen_short)) {
                   title=vorlagen_all$text[v],
                   intro = "&nbsp;",
                   annotate = "&nbsp;",
-                  folderId = 116284,
+                  folderId = folder_vorlagen_de$id,
                   data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",
                                                    tolower(monate_de[month(date_voting)]),year(date_voting),
                                                    "/master/Output/",vorlagen_short[v],"_dw.csv")))
@@ -161,13 +189,10 @@ for (v in 1:length(vorlagen_short)) {
                   title=vorlagen_all$text[v+4],
                   intro = "&nbsp;",
                   annotate = "&nbsp;",
-                  folderId = 116285,
+                  folderId = folder_vorlagen_fr$id,
                   data=list("external-data"=paste0("https://raw.githubusercontent.com/awp-finanznachrichten/lena_",
                                                    tolower(monate_de[month(date_voting)]),year(date_voting),
                                                    "/master/Output/",vorlagen_short[v],"_dw.csv")))
     dw_publish_chart(data_chart$id)
 }
 
-#Daten Speichern
-library(xlsx)
-write.xlsx(grafiken_uebersicht,"./Data/metadaten_grafiken.xlsx",row.names = FALSE)

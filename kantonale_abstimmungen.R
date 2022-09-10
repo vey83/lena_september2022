@@ -83,9 +83,6 @@ results$Ja_Stimmen_In_Prozent_Kanton <- 55  #Ja_Stimmen_Kanton Simulation
     ###Texte anpassen und optimieren
     results <- excuse_my_french(results)
     
-    #Print out texts
-    #cat(paste0(results$Gemeinde_d,"\n",results$Text_d,"\n\n",results$Text_f,collapse="\n\n"))
-    
   }
   ###Ausgezählte und nicht ausgezählte Gemeinden wieder zusammenführen -> Immer gleiches Format für Datawrapper
   if (nrow(results_notavailable) > 0) {
@@ -100,8 +97,8 @@ results$Ja_Stimmen_In_Prozent_Kanton <- 55  #Ja_Stimmen_Kanton Simulation
   }
   
 #Texte speichern
-#library(xlsx)
-#write.xlsx(results,paste0(kantonal_short[k],"_texte.xlsx"))
+library(xlsx)
+write.xlsx(results,paste0(kantonal_short[k],"_texte.xlsx"))
   
   ###Output generieren für Datawrapper
   output_dw <- get_output_gemeinden(results)

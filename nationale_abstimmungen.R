@@ -172,8 +172,8 @@ source("data_simulation_gemeinden_other.R")
   
 
 #Texte speichern
-#library(xlsx)
-#write.xlsx(results,paste0(vorlagen_short[i],"_texte.xlsx"),row.names = FALSE)
+library(xlsx)
+write.xlsx(results,paste0(vorlagen_short[i],"_texte.xlsx"),row.names = FALSE)
   
   ###Output generieren für Datawrapper
   
